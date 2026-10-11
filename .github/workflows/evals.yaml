@@ -1,0 +1,54 @@
+name: AI Evals & Prompt Regression CI
+
+on:
+  schedule:
+    # Run weekly on Sunday at midnight UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/prompts/**'
+      - 'src/extraction/**'
+      - 'evals/**'
+
+jobs:
+  rag-triad-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run RAG Triad Benchmark
+        run: |
+          python -m evals.ragas_eval
+
+      - name: Upload Eval Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ragas-eval-report
+          path: evals/reports/ragas_eval_report.json
+
+  promptfoo-regression:
+    runs-on: ubuntu-latest
+    if: false # Enable when PROMPTFOO credentials or API keys are configured in GitHub Secrets
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Promptfoo
+        uses: promptfoo/promptfoo-action@v1
+        with:
+          config: "evals/promptfoo.yaml"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}

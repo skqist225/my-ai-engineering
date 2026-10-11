@@ -1,0 +1,57 @@
+[
+  {
+    "eval_id": "GOLDEN-SEC-001",
+    "description": "Exposed GitHub Personal Access Token in Jenkinsfile environment block",
+    "input_snippet": "pipeline {\n    agent any\n    environment {\n        GITHUB_PAT = 'ghp_9876543210abcdefABCDEF1234567890abcd'\n    }\n    stages {\n        stage('Build') {\n            steps { echo 'Building' }\n        }\n    }\n}",
+    "target_file": "Jenkinsfile",
+    "expected_finding": {
+      "severity": "CRITICAL",
+      "category": "Secrets",
+      "expected_keywords": ["credential", "token", "Vault", "credentials()", "revoke"]
+    }
+  },
+  {
+    "eval_id": "GOLDEN-SEC-002",
+    "description": "Dockerfile with unpinned base image and default root user",
+    "input_snippet": "FROM golang:latest\nWORKDIR /app\nCOPY . .\nRUN go build -o server\nEXPOSE 8080\nCMD [\"./server\"]",
+    "target_file": "Dockerfile",
+    "expected_finding": {
+      "severity": "HIGH",
+      "category": "Container",
+      "expected_keywords": ["latest", "root", "USER", "digest", "CIS Docker 4.1"]
+    }
+  },
+  {
+    "eval_id": "GOLDEN-SEC-003",
+    "description": "Kubernetes pod manifest with privileged container execution",
+    "input_snippet": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: runner-pod\nspec:\n  containers:\n  - name: runner\n    image: runner:1.0.0\n    securityContext:\n      privileged: true\n      readOnlyRootFilesystem: false",
+    "target_file": "k8s/runner.yaml",
+    "expected_finding": {
+      "severity": "CRITICAL",
+      "category": "Kubernetes",
+      "expected_keywords": ["privileged", "CAP_SYS_ADMIN", "CIS Kubernetes 5.2.5", "readOnlyRootFilesystem"]
+    }
+  },
+  {
+    "eval_id": "GOLDEN-SEC-004",
+    "description": "Hardcoded AWS secret access key in deployment script",
+    "input_snippet": "export AWS_ACCESS_KEY_ID=\"AKIAIOSFODNN7EXAMPLE\"\nexport AWS_SECRET_ACCESS_KEY=\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"\naws s3 sync ./dist s3://prod-bucket",
+    "target_file": "deploy.sh",
+    "expected_finding": {
+      "severity": "CRITICAL",
+      "category": "Secrets",
+      "expected_keywords": ["AWS_SECRET_ACCESS_KEY", "IAM Role", "IRSA", "Vault"]
+    }
+  },
+  {
+    "eval_id": "GOLDEN-SEC-005",
+    "description": "Clean, hardened Kubernetes Pod manifest (Negative Test Case)",
+    "input_snippet": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: secure-app\nspec:\n  securityContext:\n    runAsNonRoot: true\n    runAsUser: 10001\n  containers:\n  - name: app\n    image: app@sha256:45b23d063f331463714093f833a6250220d475e1137495f16078c22f8371686b\n    securityContext:\n      allowPrivilegeEscalation: false\n      readOnlyRootFilesystem: true\n      capabilities:\n        drop:\n        - ALL",
+    "target_file": "k8s/secure-pod.yaml",
+    "expected_finding": {
+      "severity": "INFORMATIONAL",
+      "category": "Kubernetes",
+      "expected_keywords": ["compliant", "hardened", "pass", "no critical issues"]
+    }
+  }
+]

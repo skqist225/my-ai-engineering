@@ -1,0 +1,87 @@
+# DevSecOps AI Advisor Security Audit Report
+
+**Generated:** {{ timestamp }}
+**Scope:** {{ scope }}
+**Target Directory:** {{ repos_dir }}
+**Human Approval Granted:** {{ "YES [PASS]" if human_approved else "PENDING [WARN]" }}
+
+---
+
+## Executive Summary
+
+{{ remediation_summary }}
+
+### Finding Severity Breakdown
+
+| Severity | Count |
+|----------|-------|
+| CRITICAL | {{ severity_counts.CRITICAL }} |
+| HIGH     | {{ severity_counts.HIGH }} |
+| MEDIUM   | {{ severity_counts.MEDIUM }} |
+| LOW      | {{ severity_counts.LOW }} |
+| INFORMATIONAL | {{ severity_counts.INFORMATIONAL }} |
+| TOTAL    | {{ total_findings }} |
+
+### Rubric Baseline Compliance
+
+| Repository | [PASS] | [FAIL] | [WARN] | Total Checks |
+|------------|--------|--------|--------|--------------|
+{% for repo, stats in rubric_stats.items() %}
+| {{ repo }} | {{ stats.pass }} | {{ stats.fail }} | {{ stats.warn }} | {{ stats.total }} |
+{% endfor %}
+
+> [NOTE] This report supplements, not replaces, human security auditing.
+> Grounded verification verified file paths against real repository source trees.
+
+---
+
+## Grounded Security Findings & Remediations
+
+{% if findings %}
+{% for finding in findings %}
+### [{{ finding.severity }}] {{ finding.finding_id }}: {{ finding.title }}
+
+- **Category:** {{ finding.category }}
+- **File:** `{{ finding.file_path }}`{% if finding.line_number %} (line {{ finding.line_number }}){% endif %}
+- **Reference / Standard:** {{ finding.cve_reference or "N/A" }}
+
+**Evidence:**
+```
+{{ finding.evidence }}
+```
+
+**Step-by-Step Remediation:**
+{% for step in finding.remediation_steps %}
+1. **Step {{ step.step_number }}: {{ step.action_title }}**
+   {% if step.code_diff_patch %}
+   *Patch Proposal:*
+   ```diff
+   {{ step.code_diff_patch }}
+   ```
+   {% endif %}
+   *Verification Command:*
+   ```bash
+   {{ step.verification_command }}
+   ```
+{% endfor %}
+
+---
+{% endfor %}
+{% else %}
+_No security gaps or policy violations identified for this target scope._
+{% endif %}
+
+---
+
+## Rubric Baseline Evaluation Details
+
+{% for repo, results in rubric_results.items() %}
+### {{ repo }}
+
+| Check ID | Title | Status | Evidence / Location |
+|----------|-------|--------|---------------------|
+{% for r in results %}
+| {{ r.id }} | {{ r.title }} | [{{ r.status }}] | {{ r.evidence[:80] }} |
+{% endfor %}
+
+{% endfor %}

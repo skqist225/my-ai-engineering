@@ -1,0 +1,56 @@
+[
+  {
+    "id": "SEC-DOCKER-ROOT",
+    "category": "Dockerfile",
+    "title": "Non-Root Container User",
+    "description": "Verify container runs as an unprivileged user",
+    "rule_reference": "CIS-DOCKER-4.1",
+    "severity": "HIGH",
+    "pattern_check": "has_user_directive"
+  },
+  {
+    "id": "SEC-DOCKER-TAG",
+    "category": "Dockerfile",
+    "title": "Immutable Base Image Tag",
+    "description": "Verify base image does not use :latest tag",
+    "rule_reference": "CIS-DOCKER-4.2",
+    "severity": "MEDIUM",
+    "pattern_check": "no_latest_tag"
+  },
+  {
+    "id": "SEC-K8S-PRIVILEGE",
+    "category": "Kubernetes",
+    "title": "Disallow Privileged Containers",
+    "description": "Ensure privileged flag is not set to true",
+    "rule_reference": "CIS-K8S-5.2.1",
+    "severity": "CRITICAL",
+    "pattern_check": "not_privileged"
+  },
+  {
+    "id": "SEC-K8S-ESCALATION",
+    "category": "Kubernetes",
+    "title": "Disallow Privilege Escalation",
+    "description": "Ensure allowPrivilegeEscalation is set to false",
+    "rule_reference": "CIS-K8S-5.2.2",
+    "severity": "HIGH",
+    "pattern_check": "no_privilege_escalation"
+  },
+  {
+    "id": "SEC-K8S-RESOURCES",
+    "category": "Kubernetes",
+    "title": "Resource Limits Enforced",
+    "description": "Ensure CPU and memory limits are explicitly declared",
+    "rule_reference": "CIS-K8S-5.2.7",
+    "severity": "MEDIUM",
+    "pattern_check": "has_resource_limits"
+  },
+  {
+    "id": "SEC-CICD-PINNED-ACTIONS",
+    "category": "CI/CD",
+    "title": "Pinned GitHub Actions Commit SHA",
+    "description": "Ensure GitHub Actions are pinned to full commit hashes",
+    "rule_reference": "CICD-SEC-3",
+    "severity": "HIGH",
+    "pattern_check": "actions_pinned_to_sha"
+  }
+]
